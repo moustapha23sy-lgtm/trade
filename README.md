@@ -1,3 +1,9 @@
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+# trade
+=======
+>>>>>>> 6396d97 (first2)
 # Trade Innovation - React
 
 Site e-commerce de Trade Innovation à Dakar, Sénégal. Conversion du site HTML en application React avec Vite.
@@ -97,3 +103,7 @@ Les variables CSS sont définies dans `src/styles/global.css` :
 ## 📄 Licence
 
 © 2025 Trade Innovation. Tous droits réservés.
+<<<<<<< HEAD
+=======
+>>>>>>> ca755f5 (first)
+>>>>>>> 6396d97 (first2)
