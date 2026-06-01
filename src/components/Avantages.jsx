@@ -3,12 +3,12 @@ import '../styles/Avantages.css'
 const avantages = [
   {
     icon: 'globe-africa',
-    title: 'Livraison internationale',
-    desc: 'Expéditions transparentes entre pays, partout en Afrique et au-delà.'
+    title: 'Livraison partout au Sénégal',
+    desc: 'Livraison rapide et fiable dans toutes les régions du Sénégal.'
   },
   {
     icon: 'rotate-left',
-    title: 'Retours sous 45 jours',
+    title: 'Retours sous 15 jours',
     desc: 'Politique de retour étendue pour vous garantir une expérience sans risque.'
   },
   {

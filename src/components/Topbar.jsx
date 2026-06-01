@@ -1,4 +1,19 @@
+import React, { useState, useEffect } from 'react';
+import api from '../services/api';
+
 function Topbar() {
+  const [promo, setPromo] = useState(null);
+
+  useEffect(() => {
+    api.get('/promo/active')
+      .then(res => {
+        if (res.data.promo) {
+          setPromo(res.data.promo);
+        }
+      })
+      .catch(console.error);
+  }, []);
+
   return (
     <div className="topbar">
       <div className="topbar-inner">
@@ -8,9 +23,11 @@ function Topbar() {
           <span><i className="fas fa-map-marker-alt"></i>Sacré Cœur 3 VDN, Dakar</span>
         </div>
         <div className="topbar-right">
-          <span className="promo-pill">Code promo : FREE11CISKO</span>
-          <a href="#"><i className="fas fa-truck"></i>Livraison internationale</a>
-          <a href="#"><i className="fas fa-rotate-left"></i>Retours 45j</a>
+          {promo && (
+            <span className="promo-pill">CODE PROMO : {promo.code}</span>
+          )}
+          <a href="#"><i className="fas fa-truck"></i>Livraison partout au Sénégal</a>
+          <a href="#"><i className="fas fa-rotate-left"></i>Retours 15j</a>
         </div>
       </div>
     </div>

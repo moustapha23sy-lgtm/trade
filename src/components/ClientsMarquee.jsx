@@ -1,13 +1,15 @@
 import '../styles/ClientsMarquee.css'
 
 const clients = [
-  { name: 'Sonatel', icon: 'building' },
-  { name: 'Radisson Dakar', icon: 'hotel' },
-  { name: 'Orange Sénégal', icon: 'briefcase' },
-  { name: 'Clinique du Cap', icon: 'hospital' },
-  { name: 'Air Sénégal', icon: 'plane' },
-  { name: 'UCAD', icon: 'university' },
-  { name: 'Auchan Sénégal', icon: 'shopping-cart' }
+  { name: 'UNFPA', icon: 'globe' },
+  { name: 'LUX-DEV', icon: 'handshake' },
+  { name: 'PAPEV', icon: 'leaf' },
+  { name: 'ONU FEMME', icon: 'venus' },
+  { name: 'NATIONS UNIES', icon: 'university' },
+  { name: 'INFINITY POWER', icon: 'bolt' },
+  { name: 'MAKKIYON TRAVEL', icon: 'plane' },
+  { name: 'SALOUM PHARMA', icon: 'pills' },
+  { name: "HÔTEL GOOD RADE", icon: 'hotel' }
 ]
 
 function ClientsMarquee() {

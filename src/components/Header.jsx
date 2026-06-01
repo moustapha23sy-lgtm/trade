@@ -1,4 +1,20 @@
+import { useState, useEffect } from 'react';
+import api from '../services/api';
+
 function Header({ cartCount, onMenuToggle, onCartClick }) {
+  const [logoUrl, setLogoUrl] = useState('https://tradeinnovation-sn.com/wp-content/uploads/2025/09/logo-trade-innovation.png');
+
+  useEffect(() => {
+    // Note: The public API /settings does not need auth, it's public.
+    api.get('/settings')
+      .then(res => {
+        if (res.data.settings && res.data.settings.logo_url) {
+          setLogoUrl(res.data.settings.logo_url);
+        }
+      })
+      .catch(console.error);
+  }, []);
+
   const handleLogoError = (e) => {
     e.target.style.display = 'none'
     if (e.target.nextElementSibling) {
@@ -9,9 +25,9 @@ function Header({ cartCount, onMenuToggle, onCartClick }) {
   return (
     <header className="header">
       <div className="header-inner">
-        <a href="#" className="logo">
+        <a href="/" className="logo">
           <img 
-            src="https://tradeinnovation-sn.com/wp-content/uploads/2025/09/logo-trade-innovation.png"
+            src={logoUrl}
             alt="Trade Innovation"
             onError={handleLogoError}
           />
@@ -35,10 +51,10 @@ function Header({ cartCount, onMenuToggle, onCartClick }) {
             <span>Panier</span>
             {cartCount > 0 && <span className="cart-count">{cartCount}</span>}
           </button>
-          <button className="header-icon-btn">
+          <a href="http://localhost:5174" target="_blank" rel="noopener noreferrer" className="header-icon-btn" style={{ textDecoration: 'none' }}>
             <i className="fas fa-user"></i>
             <span>Compte</span>
-          </button>
+          </a>
           <button className="menu-toggle" onClick={onMenuToggle}>
             <i className="fas fa-bars"></i>
           </button>

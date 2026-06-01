@@ -1,44 +1,49 @@
 import { useState, useEffect } from 'react'
 
-function useCountdown(initialHours = 12, initialMinutes = 34, initialSeconds = 57) {
+function useCountdown(targetDateString) {
   const [time, setTime] = useState({
-    hours: initialHours,
-    minutes: initialMinutes,
-    seconds: initialSeconds
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+    isExpired: false
   })
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setTime(prev => {
-        let { hours, minutes, seconds } = prev
-        seconds--
-        if (seconds < 0) {
-          seconds = 59
-          minutes--
-        }
-        if (minutes < 0) {
-          minutes = 59
-          hours--
-        }
-        if (hours < 0) {
-          hours = 23
-          minutes = 59
-          seconds = 59
-        }
-        return { hours, minutes, seconds }
-      })
-    }, 1000)
+    if (!targetDateString) return;
 
-    return () => clearInterval(interval)
-  }, [])
+    const target = new Date(targetDateString).getTime();
+
+    const interval = setInterval(() => {
+      const now = new Date().getTime();
+      const distance = target - now;
+
+      if (distance < 0) {
+        clearInterval(interval);
+        setTime({ days: 0, hours: 0, minutes: 0, seconds: 0, isExpired: true });
+        return;
+      }
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      setTime({ days, hours, minutes, seconds, isExpired: false });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [targetDateString]);
 
   const formatNumber = (num) => String(num).padStart(2, '0')
 
   return {
+    days: formatNumber(time.days),
     hours: formatNumber(time.hours),
     minutes: formatNumber(time.minutes),
-    seconds: formatNumber(time.seconds)
+    seconds: formatNumber(time.seconds),
+    isExpired: time.isExpired
   }
 }
 
-export default useCountdown
+export default useCountdown;

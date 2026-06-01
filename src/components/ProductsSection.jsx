@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import ProductCard from './ProductCard'
 import '../styles/Categories.css'
 
@@ -10,10 +11,10 @@ function ProductsSection({ title, label, products, onAddToCart }) {
             <div className="section-label">{label}</div>
             <h2 className="section-title">{title.split(' ').slice(0, -1).join(' ')} <span>{title.split(' ').pop()}</span></h2>
           </div>
-          <a href="#" className="view-all">Tout voir <i className="fas fa-arrow-right"></i></a>
+          <Link to="/shop" className="view-all">Tout voir <i className="fas fa-arrow-right"></i></Link>
         </div>
         <div className="products-grid">
-          {products.map(product => (
+          {products.slice(0, 8).map(product => (
             <ProductCard 
               key={product.id} 
               product={product} 

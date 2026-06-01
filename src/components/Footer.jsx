@@ -96,7 +96,7 @@ function Footer() {
 
       <div className="footer-bottom">
         <span>
-          © 2025 Trade Innovation. Tous droits réservés. Powered by <span>Cisko Graphic Design</span>
+          © 2026 Trade Innovation. Tous droits réservés.
         </span>
         <div className="payment-icons">
           {paymentMethods.map((method, index) => (

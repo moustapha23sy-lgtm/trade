@@ -14,9 +14,9 @@ const categories = [
     image: '/1.jpeg'
   },
   {
-    title: 'Gamme Arganine',
-    desc: 'Gel, lotion, savon, shampooing — produits d\'hygiène pour l\'hôtellerie.',
-    icon: 'spa',
+    title: 'Hôtellerie',
+    desc: 'Linge, produits d\'accueil, mobilier, équipement et services personnalisés.',
+    icon: 'hotel',
     image: '/2.jpg'
   }
 ]
