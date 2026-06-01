@@ -51,7 +51,7 @@ function Header({ cartCount, onMenuToggle, onCartClick }) {
             <span>Panier</span>
             {cartCount > 0 && <span className="cart-count">{cartCount}</span>}
           </button>
-          <a href="http://localhost:5174" target="_blank" rel="noopener noreferrer" className="header-icon-btn" style={{ textDecoration: 'none' }}>
+          <a href="/admin" className="header-icon-btn" style={{ textDecoration: 'none' }}>
             <i className="fas fa-user"></i>
             <span>Compte</span>
           </a>
