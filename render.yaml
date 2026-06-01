@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: trade-innovation-api
+    env: node
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "10000"
+      - key: CORS_ORIGIN
+        value: https://trade-innovation.netlify.app
+      
+      # Ces variables devront être renseignées MANUELLEMENT lors 
+      # du déploiement ou dans le tableau de bord Render
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false

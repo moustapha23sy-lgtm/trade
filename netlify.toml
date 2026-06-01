@@ -1,6 +1,11 @@
 [build]
-  command = "npm run build"
+  command = "npm run build:all"
   publish = "dist"
+
+[[redirects]]
+  from = "/admin/*"
+  to = "/admin/index.html"
+  status = 200
 
 [[redirects]]
   from = "/*"
