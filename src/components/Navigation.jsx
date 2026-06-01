@@ -35,11 +35,29 @@ function Navigation() {
     { label: 'Accueil', isActive: window.location.pathname === '/', path: '/' }
   ];
 
-  const dynamicItems = dbCategories.map(pole => ({
-    label: pole.name,
-    hasDropdown: pole.children && pole.children.length > 0,
-    dropdownItems: pole.children ? pole.children.map(c => c.name) : []
-  }));
+  const dynamicItems = dbCategories.map(pole => {
+    const childrenNames = pole.children ? pole.children.map(c => c.name) : [];
+    const isMega = childrenNames.length >= 8; // Automatically becomes a horizontal mega menu if >= 8 items
+    
+    let megaColumns = [];
+    if (isMega) {
+      const perColumn = Math.ceil(childrenNames.length / 3);
+      for (let i = 0; i < childrenNames.length; i += perColumn) {
+        megaColumns.push({ 
+          heading: `Catégories (${i/perColumn + 1})`, 
+          items: childrenNames.slice(i, i + perColumn) 
+        });
+      }
+    }
+
+    return {
+      label: pole.name,
+      hasDropdown: childrenNames.length > 0,
+      isMega: isMega,
+      dropdownItems: childrenNames,
+      megaColumns: megaColumns
+    };
+  });
 
   const endNavItems = [
     { label: 'Shop', path: '/shop' },
