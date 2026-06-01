@@ -19,9 +19,25 @@ router.get('/', auth, async (req, res) => {
       ORDER BY ci.created_at DESC
     `, [req.user.id]);
 
+    const items = rows.map(r => ({
+      id: r.id,
+      product_id: r.product_id,
+      quantity: r.quantity,
+      product: {
+        id: r.product_id,
+        name: r.name,
+        slug: r.slug,
+        price: r.price,
+        original_price: r.original_price,
+        stock_quantity: r.stock_quantity,
+        stock_status: r.stock_status,
+        image: r.image
+      }
+    }));
+
     const total = rows.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
-    res.json({ items: rows, total, count: rows.length });
+    res.json({ items, total, count: rows.length });
   } catch (err) {
     console.error('Get cart error:', err);
     res.status(500).json({ error: 'Erreur serveur.' });
@@ -63,7 +79,7 @@ router.post('/', auth, async (req, res) => {
   }
 });
 
-// PUT /api/cart/:id — Update quantity
+// PUT /api/cart/:id — Update quantity (id is product_id)
 router.put('/:id', auth, async (req, res) => {
   try {
     const { quantity } = req.body;
@@ -73,7 +89,7 @@ router.put('/:id', auth, async (req, res) => {
     }
 
     const { rows } = await pool.query(
-      'UPDATE cart_items SET quantity = $1 WHERE id = $2 AND user_id = $3 RETURNING *',
+      'UPDATE cart_items SET quantity = $1 WHERE product_id = $2 AND user_id = $3 RETURNING *',
       [quantity, parseInt(req.params.id), req.user.id]
     );
 
@@ -88,11 +104,11 @@ router.put('/:id', auth, async (req, res) => {
   }
 });
 
-// DELETE /api/cart/:id — Remove from cart
+// DELETE /api/cart/:id — Remove from cart (id is product_id)
 router.delete('/:id', auth, async (req, res) => {
   try {
     const { rowCount } = await pool.query(
-      'DELETE FROM cart_items WHERE id = $1 AND user_id = $2',
+      'DELETE FROM cart_items WHERE product_id = $1 AND user_id = $2',
       [parseInt(req.params.id), req.user.id]
     );
 
