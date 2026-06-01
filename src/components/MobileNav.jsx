@@ -1,9 +1,17 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import api from '../services/api'
 
 function MobileNav({ isOpen, onClose }) {
   const [expandedItem, setExpandedItem] = useState(null)
+  const [dbCategories, setDbCategories] = useState([])
   const navigate = useNavigate()
+
+  useEffect(() => {
+    api.get('/categories')
+      .then(res => setDbCategories(res.data.categories || []))
+      .catch(err => console.error("Erreur chargement menu mobile:", err));
+  }, [])
 
   const handleNavClick = (e, path, categoryLabel) => {
     e.preventDefault();
@@ -18,46 +26,14 @@ function MobileNav({ isOpen, onClose }) {
     }
   };
 
+  const dynamicItems = dbCategories.map(pole => ({
+    label: pole.name,
+    subItems: pole.children && pole.children.length > 0 ? pole.children.map(c => c.name) : null
+  }));
+
   const navItems = [
     { label: 'Accueil', path: '/' },
-    { label: 'Objets Publicitaires', subItems: [
-        'Cartes de visite',
-        'Flyers / Tracts',
-        'Affiches publicitaires',
-        'Plaquettes / Dépliants',
-        'Calendriers',
-        'Broderie'
-      ]
-    },
-    { label: 'Électroménager', subItems: [
-        'Climatiseurs',
-        'Réfrigérateurs',
-        'Cuisinières',
-        'Congélateurs',
-        'Machines à laver',
-        'Téléviseurs',
-        'Micro-ondes',
-        'Petit électroménager'
-      ]
-    },
-    { label: 'Hôtellerie', subItems: [
-        'Gel',
-        'Gel Cheveux',
-        'Lotion',
-        'Savon Plissé',
-        'Shampooing & Conditionneur',
-        'Gamme Arganine',
-        'Linge hôtelier',
-        'Produit d\'accueil',
-        'Mobilier et accessoires',
-        'Communication et branding',
-        'Équipement de chambre',
-        'Signalétique et article personnalisé',
-        'Textiles personnalisés',
-        'Objet publicitaire et packaging',
-        'Impression corporate & cadeaux institutionnels'
-      ]
-    },
+    ...dynamicItems,
     { label: 'Shop', path: '/shop' },
     { label: 'Contact', path: '/contact' },
     { label: 'Mon Compte', path: '/account' }

@@ -1,7 +1,16 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import api from '../services/api';
 
 function Navigation() {
   const navigate = useNavigate();
+  const [dbCategories, setDbCategories] = useState([]);
+
+  useEffect(() => {
+    api.get('/categories')
+      .then(res => setDbCategories(res.data.categories || []))
+      .catch(err => console.error("Erreur chargement menu:", err));
+  }, []);
 
   const toSlug = (label) => label.toLowerCase()
     .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
@@ -11,86 +20,33 @@ function Navigation() {
     e.preventDefault();
     if (categoryLabel) {
       const slug = toSlug(categoryLabel);
-      // Parent poles go to the category landing page
       if (isParent) {
         navigate(`/category/${slug}`);
       } else {
-        // Sub-categories go to filtered shop
         navigate(`/shop?category=${slug}`);
       }
     } else if (path) {
       navigate(path);
     }
   };
-  const navItems = [
+
+  const baseNavItems = [
     { label: 'Tout', icon: 'th', isAll: true, path: '/shop' },
-    { label: 'Accueil', isActive: true, path: '/' },
-    { 
-      label: 'Objets Publicitaires', 
-      hasDropdown: true,
-      dropdownItems: [
-        'Cartes de visite',
-        'Flyers / Tracts',
-        'Affiches publicitaires',
-        'Plaquettes / Dépliants',
-        'Calendriers',
-        'Broderie'
-      ]
-    },
-    { 
-      label: 'Électroménager', 
-      hasDropdown: true,
-      dropdownItems: [
-        'Climatiseurs',
-        'Réfrigérateurs',
-        'Cuisinières',
-        'Congélateurs',
-        'Machines à laver',
-        'Téléviseurs',
-        'Micro-ondes',
-        'Petit électroménager'
-      ]
-    },
-    { 
-      label: 'Hôtellerie', 
-      hasDropdown: true,
-      isMega: true,
-      megaColumns: [
-        {
-          heading: 'Produits d\'accueil',
-          items: [
-            'Gel',
-            'Gel Cheveux',
-            'Lotion',
-            'Savon Plissé',
-            'Shampooing & Conditionneur',
-            'Gamme Arganine'
-          ]
-        },
-        {
-          heading: 'Services & Équipements',
-          items: [
-            'Linge hôtelier',
-            'Produit d\'accueil',
-            'Mobilier et accessoires',
-            'Équipement de chambre',
-            'Textiles personnalisés'
-          ]
-        },
-        {
-          heading: 'Communication',
-          items: [
-            'Communication et branding',
-            'Signalétique et article personnalisé',
-            'Objet publicitaire et packaging',
-            'Impression corporate & cadeaux institutionnels'
-          ]
-        }
-      ]
-    },
+    { label: 'Accueil', isActive: window.location.pathname === '/', path: '/' }
+  ];
+
+  const dynamicItems = dbCategories.map(pole => ({
+    label: pole.name,
+    hasDropdown: pole.children && pole.children.length > 0,
+    dropdownItems: pole.children ? pole.children.map(c => c.name) : []
+  }));
+
+  const endNavItems = [
     { label: 'Shop', path: '/shop' },
     { label: 'Contact', path: '/contact' }
-  ]
+  ];
+
+  const navItems = [...baseNavItems, ...dynamicItems, ...endNavItems];
 
   return (
     <nav className="nav">
