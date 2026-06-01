@@ -25,7 +25,7 @@ export const CartProvider = ({ children }) => {
   const fetchCart = async () => {
     try {
       const res = await api.get('/cart');
-      setCart(res.data);
+      setCart(res.data.items || (Array.isArray(res.data) ? res.data : []));
     } catch (error) {
       console.error("Erreur panier:", error);
     } finally {
