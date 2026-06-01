@@ -100,7 +100,7 @@ const Categories = () => {
               </tr>
             </thead>
             <tbody>
-              {categories.map((cat) => (
+              {categories.filter(c => c.parent_id !== null).map((cat) => (
                 <tr key={cat.id} style={styles.tr}
                   onMouseEnter={e => e.currentTarget.style.backgroundColor = '#f9fafb'}
                   onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
@@ -145,7 +145,7 @@ const Categories = () => {
                   </td>
                 </tr>
               ))}
-              {categories.length === 0 && (
+              {categories.filter(c => c.parent_id !== null).length === 0 && (
                 <tr><td colSpan="5" style={{ textAlign: 'center', padding: '40px 20px', color: '#9ca3af' }}>Aucune catégorie trouvée.</td></tr>
               )}
             </tbody>
@@ -166,7 +166,7 @@ const Categories = () => {
             </div>
             <form onSubmit={handleSubmit}>
               <div style={styles.formGroup}>
-                <label style={styles.label}>Nom racine / Pôle</label>
+                <label style={styles.label}>Nom de la Catégorie (ex: Climatiseurs)</label>
                 <input 
                   type="text" 
                   value={formData.name} 
@@ -186,18 +186,19 @@ const Categories = () => {
                 />
               </div>
               <div style={styles.formGroup}>
-                <label style={styles.label}>Catégorie parente</label>
+                <label style={styles.label}>Pôle de rattachement (ex: Électroménager)</label>
                 <select 
                   value={formData.parent_id} 
                   onChange={e => setFormData({...formData, parent_id: e.target.value})} 
                   style={styles.input}
+                  required
                 >
-                  <option value="">Aucun</option>
-                  {categories.map(c => (
+                  <option value="">Sélectionnez un Pôle</option>
+                  {categories.filter(c => c.parent_id === null).map(c => (
                     <option key={c.id} value={c.id}>{c.name}</option>
                   ))}
                 </select>
-                <p style={{fontSize: '12px', color: '#6b7280', marginTop: '4px'}}>Assignez un terme parent pour créer une hiérarchie.</p>
+                <p style={{fontSize: '12px', color: '#6b7280', marginTop: '4px'}}>Choisissez le Pôle principal auquel appartient cette catégorie.</p>
               </div>
               <div style={styles.formGroup}>
                 <label style={styles.label}>Description</label>

@@ -169,9 +169,15 @@ const ProductEdit = () => {
             <h2 style={styles.cardTitle}>Organisation</h2>
             <div style={styles.formGroup}>
               <label style={styles.label}>Catégorie</label>
-              <select name="category_id" value={formData.category_id || ''} onChange={handleChange} style={styles.input}>
+              <select name="category_id" value={formData.category_id || ''} onChange={handleChange} style={styles.input} required>
                 <option value="">Sélectionner une catégorie</option>
-                {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                {categories.filter(c => c.parent_id === null).map(pole => (
+                  <optgroup key={pole.id} label={pole.name}>
+                    {categories.filter(c => c.parent_id === pole.id).map(sub => (
+                      <option key={sub.id} value={sub.id}>{sub.name}</option>
+                    ))}
+                  </optgroup>
+                ))}
               </select>
             </div>
             <div style={styles.formGroup}>
