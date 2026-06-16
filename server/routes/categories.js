@@ -15,23 +15,28 @@ function slugify(text) {
     .replace(/^-+|-+$/g, '');
 }
 
+function buildTree(rows, parentId = null) {
+  return rows
+    .filter((c) => c.parent_id === parentId)
+    .map((parent) => ({
+      ...parent,
+      children: buildTree(rows, parent.id),
+    }));
+}
+
 // GET /api/categories — All categories (with subcategories)
 router.get('/', async (req, res) => {
   try {
     const { rows } = await pool.query(`
       SELECT c.*, 
-        (SELECT COUNT(*) FROM products p WHERE p.category_id = c.id AND p.is_published = true) as product_count
+        (SELECT COUNT(*) FROM products p WHERE p.category_id = c.id AND p.is_published = true) as product_count,
+        (SELECT COUNT(*) FROM categories ch WHERE ch.parent_id = c.id AND ch.is_active = true) as child_count
       FROM categories c
       WHERE c.is_active = true
       ORDER BY c.sort_order, c.name
     `);
 
-    // Organize into tree structure
-    const parents = rows.filter(c => !c.parent_id);
-    const tree = parents.map(parent => ({
-      ...parent,
-      children: rows.filter(c => c.parent_id === parent.id),
-    }));
+    const tree = buildTree(rows);
 
     res.json({ categories: tree, all: rows });
   } catch (err) {
@@ -54,13 +59,27 @@ router.get('/:slug', async (req, res) => {
 
     const category = rows[0];
 
-    // Get subcategories
-    const { rows: children } = await pool.query(
-      'SELECT * FROM categories WHERE parent_id = $1 AND is_active = true ORDER BY sort_order',
-      [category.id]
-    );
+    const { rows: allRows } = await pool.query(`
+      SELECT c.*,
+        (SELECT COUNT(*) FROM products p WHERE p.category_id = c.id AND p.is_published = true) as product_count,
+        (SELECT COUNT(*) FROM categories ch WHERE ch.parent_id = c.id AND ch.is_active = true) as child_count
+      FROM categories c
+      WHERE c.is_active = true
+      ORDER BY c.sort_order, c.name
+    `);
 
-    res.json({ category: { ...category, children } });
+    const children = buildTree(allRows, category.id);
+
+    const ancestors = [];
+    let current = category;
+    while (current.parent_id) {
+      const parent = allRows.find((c) => c.id === current.parent_id);
+      if (!parent) break;
+      ancestors.unshift(parent);
+      current = parent;
+    }
+
+    res.json({ category: { ...category, children, ancestors } });
   } catch (err) {
     console.error('Category detail error:', err);
     res.status(500).json({ error: 'Erreur serveur.' });

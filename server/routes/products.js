@@ -40,7 +40,15 @@ router.get('/', async (req, res) => {
     let paramIndex = 1;
 
     if (category) {
-      conditions.push(`(c.slug = $${paramIndex} OR c.parent_id = (SELECT id FROM categories WHERE slug = $${paramIndex}))`);
+      conditions.push(`c.id IN (
+        WITH RECURSIVE descendants AS (
+          SELECT id FROM categories WHERE slug = $${paramIndex}
+          UNION ALL
+          SELECT cat.id FROM categories cat
+          INNER JOIN descendants d ON cat.parent_id = d.id
+        )
+        SELECT id FROM descendants
+      )`);
       params.push(category);
       paramIndex++;
     }

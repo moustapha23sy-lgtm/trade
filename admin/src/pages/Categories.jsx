@@ -1,7 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Plus, Edit, Trash2, FolderTree, X, Save } from 'lucide-react';
 import api from '../services/api';
 import ImageUpload from '../components/ImageUpload';
+import {
+  buildTree,
+  getCategoryPath,
+  getDepth,
+  getLevelLabel,
+  getParentOptions,
+} from '../utils/categories';
 
 const Categories = () => {
   const [categories, setCategories] = useState([]);
@@ -26,15 +33,30 @@ const Categories = () => {
     }
   };
 
+  const tree = useMemo(() => buildTree(categories), [categories]);
+  const parentOptions = useMemo(() => getParentOptions(categories), [categories]);
+
+  const flatRows = useMemo(() => {
+    const rows = [];
+    tree.forEach((pole) => {
+      const walk = (node, depth) => {
+        rows.push({ ...node, depth, poleName: pole.name });
+        (node.children || []).forEach((child) => walk(child, depth + 1));
+      };
+      (pole.children || []).forEach((child) => walk(child, 1));
+    });
+    return rows;
+  }, [tree]);
+
   const handleOpenModal = (cat = null) => {
     if (cat) {
       setEditingCat(cat);
-      setFormData({ 
-        name: cat.name, 
-        slug: cat.slug || '', 
+      setFormData({
+        name: cat.name,
+        slug: cat.slug || '',
         description: cat.description || '',
         parent_id: cat.parent_id || '',
-        image_url: cat.image_url || ''
+        image_url: cat.image_url || '',
       });
     } else {
       setEditingCat(null);
@@ -87,23 +109,26 @@ const Categories = () => {
 
       <div style={styles.card}>
         {loading ? (
-          <div style={{padding: '20px', textAlign: 'center'}}>Chargement...</div>
+          <div style={{ padding: '20px', textAlign: 'center' }}>Chargement...</div>
         ) : (
           <table style={styles.table}>
             <thead>
               <tr>
                 <th style={styles.th}>Image</th>
                 <th style={styles.th}>Nom</th>
+                <th style={styles.th}>Niveau</th>
+                <th style={styles.th}>Chemin</th>
                 <th style={styles.th}>Slug</th>
-                <th style={styles.th}>Description</th>
                 <th style={styles.th}>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {categories.filter(c => c.parent_id !== null).map((cat) => (
-                <tr key={cat.id} style={styles.tr}
-                  onMouseEnter={e => e.currentTarget.style.backgroundColor = '#f9fafb'}
-                  onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
+              {flatRows.map((cat) => (
+                <tr
+                  key={cat.id}
+                  style={styles.tr}
+                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#f9fafb'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
                 >
                   <td style={styles.td}>
                     {cat.image_url ? (
@@ -111,7 +136,7 @@ const Categories = () => {
                         src={cat.image_url}
                         alt={cat.name}
                         style={{ width: 44, height: 44, objectFit: 'cover', borderRadius: 8, border: '1px solid #f3f4f6', display: 'block' }}
-                        onError={e => { e.target.style.display='none'; e.target.nextSibling.style.display='flex'; }}
+                        onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
                       />
                     ) : null}
                     <div style={{
@@ -123,30 +148,50 @@ const Categories = () => {
                     </div>
                   </td>
                   <td style={styles.td}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ fontWeight: '600', color: '#111827' }}>{cat.name}</span>
-                    </div>
+                    <span style={{
+                      fontWeight: getDepth(cat, categories) === 1 ? '600' : '500',
+                      color: '#111827',
+                      paddingLeft: `${(cat.depth - 1) * 20}px`,
+                      display: 'inline-block',
+                    }}>
+                      {cat.name}
+                    </span>
+                  </td>
+                  <td style={styles.td}>
+                    <span style={styles.levelBadge}>{getLevelLabel(cat, categories)}</span>
+                  </td>
+                  <td style={{ ...styles.td, color: '#6b7280', fontSize: 13 }}>
+                    {getCategoryPath(cat, categories)}
                   </td>
                   <td style={{ ...styles.td, color: '#9ca3af', fontSize: 13 }}>{cat.slug}</td>
-                  <td style={{ ...styles.td, color: '#6b7280', fontSize: 13 }}>{cat.description || '—'}</td>
                   <td style={styles.td}>
                     <div style={styles.actions}>
-                      <button style={styles.editBtn} onClick={() => handleOpenModal(cat)}
-                        onMouseEnter={e => { e.currentTarget.style.background='#2563eb'; e.currentTarget.style.color='#fff'; }}
-                        onMouseLeave={e => { e.currentTarget.style.background='#eff6ff'; e.currentTarget.style.color='#2563eb'; }}>
+                      <button
+                        style={styles.editBtn}
+                        onClick={() => handleOpenModal(cat)}
+                        onMouseEnter={(e) => { e.currentTarget.style.background = '#2563eb'; e.currentTarget.style.color = '#fff'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.background = '#eff6ff'; e.currentTarget.style.color = '#2563eb'; }}
+                      >
                         <Edit size={16} />
                       </button>
-                      <button style={styles.deleteBtn} onClick={() => handleDelete(cat.id)}
-                        onMouseEnter={e => { e.currentTarget.style.background='#ef4444'; e.currentTarget.style.color='#fff'; }}
-                        onMouseLeave={e => { e.currentTarget.style.background='#fef2f2'; e.currentTarget.style.color='#ef4444'; }}>
+                      <button
+                        style={styles.deleteBtn}
+                        onClick={() => handleDelete(cat.id)}
+                        onMouseEnter={(e) => { e.currentTarget.style.background = '#ef4444'; e.currentTarget.style.color = '#fff'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.background = '#fef2f2'; e.currentTarget.style.color = '#ef4444'; }}
+                      >
                         <Trash2 size={16} />
                       </button>
                     </div>
                   </td>
                 </tr>
               ))}
-              {categories.filter(c => c.parent_id !== null).length === 0 && (
-                <tr><td colSpan="5" style={{ textAlign: 'center', padding: '40px 20px', color: '#9ca3af' }}>Aucune catégorie trouvée.</td></tr>
+              {flatRows.length === 0 && (
+                <tr>
+                  <td colSpan="6" style={{ textAlign: 'center', padding: '40px 20px', color: '#9ca3af' }}>
+                    Aucune catégorie trouvée.
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>
@@ -166,53 +211,61 @@ const Categories = () => {
             </div>
             <form onSubmit={handleSubmit}>
               <div style={styles.formGroup}>
-                <label style={styles.label}>Nom de la Catégorie (ex: Climatiseurs)</label>
-                <input 
-                  type="text" 
-                  value={formData.name} 
-                  onChange={e => setFormData({...formData, name: e.target.value})} 
-                  style={styles.input} 
-                  required 
+                <label style={styles.label}>Nom</label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  style={styles.input}
+                  placeholder="Ex: Stylo, Objets promotionnels, Climatiseurs..."
+                  required
                 />
               </div>
               <div style={styles.formGroup}>
-                <label style={styles.label}>Slug (Optionnel)</label>
-                <input 
-                  type="text" 
-                  value={formData.slug} 
-                  onChange={e => setFormData({...formData, slug: e.target.value})} 
-                  style={styles.input} 
+                <label style={styles.label}>Slug (optionnel)</label>
+                <input
+                  type="text"
+                  value={formData.slug}
+                  onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                  style={styles.input}
                   placeholder="Laissez vide pour auto-générer"
                 />
               </div>
               <div style={styles.formGroup}>
-                <label style={styles.label}>Pôle de rattachement (ex: Électroménager)</label>
-                <select 
-                  value={formData.parent_id} 
-                  onChange={e => setFormData({...formData, parent_id: e.target.value})} 
+                <label style={styles.label}>Rattachement parent</label>
+                <select
+                  value={formData.parent_id}
+                  onChange={(e) => setFormData({ ...formData, parent_id: e.target.value })}
                   style={styles.input}
                   required
                 >
-                  <option value="">Sélectionnez un Pôle</option>
-                  {categories.filter(c => c.parent_id === null).map(c => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
+                  <option value="">Sélectionnez un parent</option>
+                  {parentOptions.map((opt) => (
+                    <option key={opt.id} value={opt.id}>
+                      {opt.depth > 0 ? `└ ${opt.label}` : opt.label}
+                      {opt.type === 'pole' ? ' (Pôle)' : ''}
+                    </option>
                   ))}
                 </select>
-                <p style={{fontSize: '12px', color: '#6b7280', marginTop: '4px'}}>Choisissez le Pôle principal auquel appartient cette catégorie.</p>
+                <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>
+                  Choisissez un <strong>pôle</strong> pour une catégorie intermédiaire (ex: Objets promotionnels),
+                  ou une <strong>catégorie</strong> pour une sous-catégorie produit (ex: Stylo).
+                  Pour l&apos;Électroménager, rattachez directement au pôle.
+                </p>
               </div>
               <div style={styles.formGroup}>
                 <label style={styles.label}>Description</label>
-                <textarea 
-                  value={formData.description} 
-                  onChange={e => setFormData({...formData, description: e.target.value})} 
-                  style={{...styles.input, minHeight: '80px', resize: 'vertical'}} 
+                <textarea
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  style={{ ...styles.input, minHeight: '80px', resize: 'vertical' }}
                 />
               </div>
               <div style={styles.formGroup}>
                 <label style={styles.label}>Miniature</label>
-                <ImageUpload 
-                  value={formData.image_url} 
-                  onChange={(url) => setFormData({...formData, image_url: url})} 
+                <ImageUpload
+                  value={formData.image_url}
+                  onChange={(url) => setFormData({ ...formData, image_url: url })}
                 />
               </div>
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '24px' }}>
@@ -273,6 +326,15 @@ const styles = {
   },
   tr: { borderBottom: '1px solid var(--border-color)', transition: 'background-color 0.15s' },
   td: { padding: '14px 20px', verticalAlign: 'middle' },
+  levelBadge: {
+    display: 'inline-block',
+    padding: '3px 10px',
+    borderRadius: '9999px',
+    fontSize: '11px',
+    fontWeight: '600',
+    backgroundColor: '#eff6ff',
+    color: '#2563eb',
+  },
   actions: { display: 'flex', gap: 8 },
   editBtn: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 34, height: 34, borderRadius: 8, border: 'none', background: '#eff6ff', color: '#2563eb', cursor: 'pointer', transition: 'all 0.18s' },
   deleteBtn: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 34, height: 34, borderRadius: 8, border: 'none', background: '#fef2f2', color: '#ef4444', cursor: 'pointer', transition: 'all 0.18s' },
@@ -280,23 +342,23 @@ const styles = {
     position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
     backgroundColor: 'rgba(0,0,0,0.5)',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
-    zIndex: 1000
+    zIndex: 1000,
   },
   modalContent: {
     backgroundColor: '#fff', borderRadius: '8px',
     width: '100%', maxWidth: '600px', padding: '24px',
     maxHeight: '90vh', overflowY: 'auto',
-    boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+    boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
   },
   modalHeader: {
     display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-    marginBottom: '20px'
+    marginBottom: '20px',
   },
   formGroup: { marginBottom: '16px' },
   label: { display: 'block', fontSize: '14px', fontWeight: '500', color: 'var(--text-main)', marginBottom: '8px' },
   input: { width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid var(--border-color)', outline: 'none' },
   cancelBtn: { padding: '8px 16px', borderRadius: '6px', backgroundColor: '#f3f4f6', color: '#4b5563', fontWeight: '500', border: 'none', cursor: 'pointer' },
-  saveBtn: { padding: '8px 16px', borderRadius: '6px', backgroundColor: 'var(--primary-color)', color: '#fff', fontWeight: '500', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }
+  saveBtn: { padding: '8px 16px', borderRadius: '6px', backgroundColor: 'var(--primary-color)', color: '#fff', fontWeight: '500', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' },
 };
 
 export default Categories;

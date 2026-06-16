@@ -3,6 +3,7 @@ import { Save, X, Image as ImageIcon } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../services/api';
 import ImageUpload from '../components/ImageUpload';
+import { buildTree, getLeafCategories, getCategoryPath } from '../utils/categories';
 
 const ProductEdit = () => {
   const { id } = useParams();
@@ -91,6 +92,9 @@ const ProductEdit = () => {
     }
   };
 
+  const categoryTree = buildTree(categories);
+  const leafCategories = getLeafCategories(categories);
+
   return (
     <div>
       <div style={styles.header}>
@@ -171,11 +175,22 @@ const ProductEdit = () => {
               <label style={styles.label}>Catégorie</label>
               <select name="category_id" value={formData.category_id || ''} onChange={handleChange} style={styles.input} required>
                 <option value="">Sélectionner une catégorie</option>
-                {categories.filter(c => c.parent_id === null).map(pole => (
+                {categoryTree.map((pole) => (
                   <optgroup key={pole.id} label={pole.name}>
-                    {categories.filter(c => c.parent_id === pole.id).map(sub => (
-                      <option key={sub.id} value={sub.id}>{sub.name}</option>
-                    ))}
+                    {leafCategories
+                      .filter((leaf) => {
+                        let current = leaf;
+                        while (current?.parent_id) {
+                          if (current.parent_id === pole.id) return true;
+                          current = categories.find((c) => c.id === current.parent_id);
+                        }
+                        return false;
+                      })
+                      .map((leaf) => (
+                        <option key={leaf.id} value={leaf.id}>
+                          {getCategoryPath(leaf, categories).replace(`${pole.name} › `, '')}
+                        </option>
+                      ))}
                   </optgroup>
                 ))}
               </select>

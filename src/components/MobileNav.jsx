@@ -3,50 +3,34 @@ import { useNavigate } from 'react-router-dom'
 import api from '../services/api'
 
 function MobileNav({ isOpen, onClose }) {
-  const [expandedItem, setExpandedItem] = useState(null)
-  const [dbCategories, setDbCategories] = useState([])
+  const [expandedPole, setExpandedPole]   = useState(null)
+  const [expandedCat,  setExpandedCat]    = useState(null)
+  const [poles, setPoles] = useState([])
   const navigate = useNavigate()
 
   useEffect(() => {
     api.get('/categories')
-      .then(res => setDbCategories(res.data.categories || []))
-      .catch(err => console.error("Erreur chargement menu mobile:", err));
+      .then(res => setPoles(res.data.categories || []))
+      .catch(err => console.error('Erreur chargement menu mobile:', err))
   }, [])
 
-  const handleNavClick = (e, path, categoryLabel) => {
-    e.preventDefault();
-    onClose();
-    if (categoryLabel) {
-      const slug = categoryLabel.toLowerCase()
-        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-      navigate(`/shop?category=${slug}`);
-    } else if (path) {
-      navigate(path);
+  const go = (path) => { onClose(); navigate(path) }
+
+  const goToItem = (item) => {
+    const hasKids = parseInt(item.child_count) > 0 || (item.children && item.children.length > 0)
+    if (hasKids) {
+      go(`/category/${item.slug}`)
+    } else {
+      go(`/shop?category=${item.slug}`)
     }
-  };
-
-  const dynamicItems = dbCategories.map(pole => ({
-    label: pole.name,
-    subItems: pole.children && pole.children.length > 0 ? pole.children.map(c => c.name) : null
-  }));
-
-  const navItems = [
-    { label: 'Accueil', path: '/' },
-    ...dynamicItems,
-    { label: 'Shop', path: '/shop' },
-    { label: 'Contact', path: '/contact' },
-    { label: 'Mon Compte', path: '/account' }
-  ]
-
-  const toggleExpand = (index) => {
-    setExpandedItem(expandedItem === index ? null : index)
   }
 
   return (
     <div className={`mobile-nav ${isOpen ? 'open' : ''}`}>
       <div className="nav-backdrop" onClick={onClose}></div>
       <div className="nav-drawer">
+
+        {/* Header */}
         <div className="drawer-head">
           <div className="logo-fallback">
             Trade<span style={{ color: 'var(--orange)' }}>Innovation</span>
@@ -55,40 +39,107 @@ function MobileNav({ isOpen, onClose }) {
             <i className="fas fa-times"></i>
           </button>
         </div>
-        
-        {navItems.map((item, index) => (
-          <div key={index}>
-            <a 
-              href={item.path || '#'}
-              className="drawer-link" 
-              onClick={(e) => {
-                if (item.subItems) {
+
+        {/* Accueil */}
+        <a href="/" className="drawer-link" onClick={e => { e.preventDefault(); go('/') }}>
+          Accueil <i className="fas fa-chevron-right"></i>
+        </a>
+
+        {/* Pôles dynamiques */}
+        {poles.map((pole, poleIdx) => {
+          const children = pole.children || []
+          const hasChildren = children.length > 0
+          const isPoleOpen = expandedPole === poleIdx
+
+          return (
+            <div key={pole.id}>
+              {/* Niveau 1 : Pôle */}
+              <a
+                href="#"
+                className="drawer-link"
+                onClick={e => {
                   e.preventDefault()
-                  toggleExpand(index)
-                } else {
-                  handleNavClick(e, item.path)
+                  if (hasChildren) {
+                    setExpandedPole(isPoleOpen ? null : poleIdx)
+                    setExpandedCat(null)
+                  } else {
+                    go(`/category/${pole.slug}`)
+                  }
+                }}
+              >
+                {pole.name}
+                {hasChildren
+                  ? <i className={`fas fa-chevron-${isPoleOpen ? 'down' : 'right'}`}></i>
+                  : <i className="fas fa-chevron-right"></i>
                 }
-              }}
-            >
-              {item.label} 
-              {item.subItems ? (
-                <i className={`fas fa-chevron-${expandedItem === index ? 'down' : 'right'}`}></i>
-              ) : (
-                <i className="fas fa-chevron-right"></i>
+              </a>
+
+              {/* Niveau 2 : Catégories */}
+              {hasChildren && isPoleOpen && (
+                <div className="drawer-sub-menu">
+                  {children.map((cat, catIdx) => {
+                    const subChildren = cat.children || []
+                    const hasSubKids = subChildren.length > 0 || parseInt(cat.child_count) > 0
+                    const isCatOpen  = expandedCat === `${poleIdx}-${catIdx}`
+
+                    return (
+                      <div key={cat.id}>
+                        {/* Niveau 2 item */}
+                        <a
+                          href="#"
+                          className="drawer-sub-link drawer-group-link"
+                          onClick={e => {
+                            e.preventDefault()
+                            if (hasSubKids) {
+                              setExpandedCat(isCatOpen ? null : `${poleIdx}-${catIdx}`)
+                            } else {
+                              onClose()
+                              goToItem(cat)
+                            }
+                          }}
+                        >
+                          {cat.name}
+                          {hasSubKids && (
+                            <i className={`fas fa-chevron-${isCatOpen ? 'down' : 'right'}`}></i>
+                          )}
+                        </a>
+
+                        {/* Niveau 3 : Sous-catégories */}
+                        {hasSubKids && isCatOpen && (
+                          <div className="drawer-leaf-menu">
+                            {subChildren.map(sub => (
+                              <a
+                                key={sub.id}
+                                href="#"
+                                className="drawer-leaf-link"
+                                onClick={e => { e.preventDefault(); onClose(); goToItem(sub) }}
+                              >
+                                {sub.name}
+                              </a>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
               )}
-            </a>
-            {item.subItems && expandedItem === index && (
-              <div className="drawer-sub-menu">
-                {item.subItems.map((sub, subIndex) => (
-                  <a key={subIndex} href="#" className="drawer-sub-link" onClick={(e) => handleNavClick(e, null, sub)}>
-                    {sub}
-                  </a>
-                ))}
-              </div>
-            )}
-          </div>
-        ))}
-        
+            </div>
+          )
+        })}
+
+        {/* Shop, Contact, Compte */}
+        <a href="/shop"    className="drawer-link" onClick={e => { e.preventDefault(); go('/shop') }}>
+          Shop <i className="fas fa-chevron-right"></i>
+        </a>
+        <a href="/contact" className="drawer-link" onClick={e => { e.preventDefault(); go('/contact') }}>
+          Contact <i className="fas fa-chevron-right"></i>
+        </a>
+        <a href="/account" className="drawer-link" onClick={e => { e.preventDefault(); go('/account') }}>
+          Mon Compte <i className="fas fa-chevron-right"></i>
+        </a>
+
+        {/* Contact info */}
         <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid var(--gray-mid)' }}>
           <p style={{ fontSize: '.8rem', color: 'var(--text-muted)', marginBottom: '.8rem' }}>Contact</p>
           <p style={{ fontSize: '.85rem', fontWeight: 600, color: 'var(--navy)' }}>
@@ -100,6 +151,7 @@ function MobileNav({ isOpen, onClose }) {
             tradeinnovation.sn@gmail.com
           </p>
         </div>
+
       </div>
     </div>
   )

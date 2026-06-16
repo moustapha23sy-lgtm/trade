@@ -14,8 +14,8 @@ const categories = [
     image: '/1.jpeg'
   },
   {
-    title: 'Hôtellerie',
-    desc: 'Linge, produits d\'accueil, mobilier, équipement et services personnalisés.',
+    title: 'Fournitures et Équipement Hôtelier',
+    desc: 'Équipements de chambre, linge hôtelier, salle de bain et produits d\'accueil.',
     icon: 'hotel',
     image: '/2.jpg'
   }

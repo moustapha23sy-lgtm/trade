@@ -5,7 +5,7 @@ const categoryImages = {
   // ===== PARENTS =====
   'objets-publicitaires': 'https://images.unsplash.com/photo-1612831455740-1ad22a9cb6bf?w=600&q=80',
   'electromenager': 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=600&q=80',
-  'hotellerie': 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=600&q=80',
+  'fournitures-equipement-hotelier': 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=600&q=80',
 
   // ===== OBJETS PUBLICITAIRES =====
   'cartes-de-visite': 'https://images.unsplash.com/photo-1586380951230-ddbf0015bec8?w=600&q=80',

@@ -4,114 +4,116 @@ import api from '../services/api';
 
 function Navigation() {
   const navigate = useNavigate();
-  const [dbCategories, setDbCategories] = useState([]);
+  const [poles, setPoles] = useState([]);
 
   useEffect(() => {
     api.get('/categories')
-      .then(res => setDbCategories(res.data.categories || []))
-      .catch(err => console.error("Erreur chargement menu:", err));
+      .then(res => setPoles(res.data.categories || []))
+      .catch(err => console.error('Erreur chargement menu:', err));
   }, []);
 
-  const toSlug = (label) => label.toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-
-  const handleNavClick = (e, path, categoryLabel, isParent = false) => {
+  // Navigate: if item has children → category page, else → shop filter
+  const goTo = (e, item) => {
     e.preventDefault();
-    if (categoryLabel) {
-      const slug = toSlug(categoryLabel);
-      if (isParent) {
-        navigate(`/category/${slug}`);
-      } else {
-        navigate(`/shop?category=${slug}`);
-      }
-    } else if (path) {
-      navigate(path);
+    const hasKids = parseInt(item.child_count) > 0 || (item.children && item.children.length > 0);
+    if (hasKids) {
+      navigate(`/category/${item.slug}`);
+    } else {
+      navigate(`/shop?category=${item.slug}`);
     }
   };
 
-  const baseNavItems = [
-    { label: 'Tout', icon: 'th', isAll: true, path: '/shop' },
-    { label: 'Accueil', isActive: window.location.pathname === '/', path: '/' }
-  ];
-
-  const dynamicItems = dbCategories.map(pole => {
-    const childrenNames = pole.children ? pole.children.map(c => c.name) : [];
-    const isMega = childrenNames.length >= 8; // Automatically becomes a horizontal mega menu if >= 8 items
-    
-    let megaColumns = [];
-    if (isMega) {
-      const perColumn = Math.ceil(childrenNames.length / 3);
-      for (let i = 0; i < childrenNames.length; i += perColumn) {
-        megaColumns.push({ 
-          heading: `Catégories (${i/perColumn + 1})`, 
-          items: childrenNames.slice(i, i + perColumn) 
-        });
-      }
-    }
-
-    return {
-      label: pole.name,
-      hasDropdown: childrenNames.length > 0,
-      isMega: isMega,
-      dropdownItems: childrenNames,
-      megaColumns: megaColumns
-    };
-  });
-
-  const endNavItems = [
-    { label: 'Shop', path: '/shop' },
-    { label: 'Contact', path: '/contact' }
-  ];
-
-  const navItems = [...baseNavItems, ...dynamicItems, ...endNavItems];
+  const goToPole = (e, pole) => {
+    e.preventDefault();
+    navigate(`/category/${pole.slug}`);
+  };
 
   return (
     <nav className="nav">
       <div className="nav-inner">
-        {navItems.map((item, index) => (
-          <div key={index} className={`nav-item ${item.isMega ? 'nav-item-mega' : ''}`}>
-            <a 
-              href={item.path || '#'}
-              onClick={(e) => {
-                if (item.hasDropdown) {
-                  // Navigate to category landing page on parent click
-                  handleNavClick(e, null, item.label, true);
-                } else {
-                  handleNavClick(e, item.path);
-                }
-              }}
-              className={`nav-link ${item.isAll ? 'nav-all' : ''} ${item.isActive ? 'active' : ''}`}
-            >
-              {item.icon && <i className={`fas fa-${item.icon}`}></i>}
-              {item.label}
-              {item.hasDropdown && <i className="fas fa-chevron-down"></i>}
-            </a>
-            {item.hasDropdown && !item.isMega && (
+
+        {/* Static: Tout */}
+        <div className="nav-item">
+          <a href="/shop" className="nav-link nav-all" onClick={e => { e.preventDefault(); navigate('/shop'); }}>
+            <i className="fas fa-th"></i> Tout
+          </a>
+        </div>
+
+        {/* Static: Accueil */}
+        <div className="nav-item">
+          <a href="/" className={`nav-link ${window.location.pathname === '/' ? 'active' : ''}`}
+            onClick={e => { e.preventDefault(); navigate('/'); }}>
+            Accueil
+          </a>
+        </div>
+
+        {/* Dynamic poles */}
+        {poles.map(pole => {
+          const children = pole.children || [];
+          if (children.length === 0) return null;
+
+          // Check if any child has its own children (3-level hierarchy)
+          const hasDeepChildren = children.some(
+            c => parseInt(c.child_count) > 0 || (c.children && c.children.length > 0)
+          );
+
+          return (
+            <div key={pole.id} className={`nav-item ${hasDeepChildren ? 'nav-item-mega' : ''}`}>
+              <a
+                href={`/category/${pole.slug}`}
+                className="nav-link"
+                onClick={e => goToPole(e, pole)}
+              >
+                {pole.name}
+                <i className="fas fa-chevron-down"></i>
+              </a>
+
+              {/* Dropdown Menu (supports up to 3 levels) */}
               <div className="dropdown">
-                {item.dropdownItems.map((subItem, subIndex) => (
-                  <a key={subIndex} href="#" onClick={(e) => handleNavClick(e, null, subItem, false)}>{subItem}</a>
-                ))}
+                {children.map(cat => {
+                  const subChildren = cat.children || [];
+                  const hasSubKids = subChildren.length > 0;
+
+                  return (
+                    <div key={cat.id} className={`dropdown-item ${hasSubKids ? 'has-submenu' : ''}`}>
+                      <a href={`/category/${cat.slug}`} onClick={e => goTo(e, cat)}>
+                        {cat.name}
+                        {hasSubKids && <i className="fas fa-chevron-right submenu-icon"></i>}
+                      </a>
+
+                      {/* Level 3: Submenu */}
+                      {hasSubKids && (
+                        <div className="submenu">
+                          {subChildren.map(sub => (
+                            <a key={sub.id} href={`/shop?category=${sub.slug}`} onClick={e => goTo(e, sub)}>
+                              {sub.name}
+                            </a>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
-            )}
-            {item.isMega && (
-              <div className="mega-dropdown">
-                {item.megaColumns.map((col, colIndex) => (
-                  <div key={colIndex} className="mega-col">
-                    <div className="mega-col-heading">{col.heading}</div>
-                    {col.items.map((subItem, subIndex) => (
-                      <a key={subIndex} href="#" onClick={(e) => handleNavClick(e, null, subItem)}>{subItem}</a>
-                    ))}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        ))}
+            </div>
+          );
+        })}
+
+        {/* Static: Shop, Contact */}
+        <div className="nav-item">
+          <a href="/shop" className="nav-link" onClick={e => { e.preventDefault(); navigate('/shop'); }}>
+            Shop
+          </a>
+        </div>
+        <div className="nav-item">
+          <a href="/contact" className="nav-link" onClick={e => { e.preventDefault(); navigate('/contact'); }}>
+            Contact
+          </a>
+        </div>
+
       </div>
     </nav>
-  )
+  );
 }
 
-export default Navigation
-
+export default Navigation;
