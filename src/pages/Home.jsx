@@ -27,8 +27,8 @@ const Home = ({ showToast }) => {
             image: p.image_url || 'https://via.placeholder.com/400',
             badge: p.badge,
             category: p.category_name || 'Divers',
-            slug: p.slug || p.id.toString(),
-            name: p.description || p.name,
+            slug: p.slug,
+            name: p.name,
             price: Number(p.price) || 0,
             originalPrice: Number(p.original_price) || null
           }));

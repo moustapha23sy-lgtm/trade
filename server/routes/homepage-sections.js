@@ -17,7 +17,7 @@ router.get('/:key', async (req, res) => {
     const { rows } = await pool.query(`
       SELECT 
         hs.id as section_id, hs.position,
-        p.id, p.name, p.price, p.original_price, p.badge, p.stock_status,
+        p.id, p.slug, p.name, p.price, p.original_price, p.badge, p.stock_status,
         p.description,
         c.name as category_name,
         (SELECT image_url FROM product_images WHERE product_id = p.id AND is_primary = true LIMIT 1) as image_url

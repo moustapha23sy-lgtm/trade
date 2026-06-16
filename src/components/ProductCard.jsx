@@ -34,7 +34,7 @@ function ProductCard({ product, onAddToCart }) {
           {originalPrice && <span>{originalPrice}</span>}
           {price}
         </div>
-        <button className="btn-cart" onClick={onAddToCart}>
+        <button className="btn-cart" onClick={() => onAddToCart(product)}>
           <i className="fas fa-shopping-bag"></i> Ajouter au panier
         </button>
       </div>
