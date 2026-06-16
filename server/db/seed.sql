@@ -142,34 +142,36 @@ INSERT INTO products (name, slug, description, price, original_price, category_i
 
 -- Linge Hôtelier (category_id=17)
 INSERT INTO products (name, slug, description, price, original_price, category_id, sku, stock_quantity, stock_status, badge, is_published, is_featured) VALUES
-('Draps et housses hôteliers',         'draps-housses-hoteliers',     'Draps et housses de couette professionnels. Coton blanc 200 fils. Lavage industriel.',8500,NULL,17,'LINGE-DRAPS',100,'in_stock',NULL,true,true),
-('Couettes et oreillers',              'couettes-oreillers',          'Couettes et oreillers garnissage microfibres. Toutes tailles disponibles.',          6500,NULL,17,'LINGE-COUE',  80,'in_stock',NULL,true,false),
-('Serviettes et peignoirs',            'serviettes-peignoirs',        'Serviettes de bain et peignoirs éponge 500g/m². Broderie disponible.',              4500,NULL,17,'LINGE-SERV', 150,'in_stock',NULL,true,true),
-('Tapis et chaussons de bain',         'tapis-chaussons-bain',        'Tapis de bain et chaussons jetables ou réutilisables. Vente au carton.',            2500,NULL,17,'LINGE-TAPIS',200,'in_stock',NULL,true,false);
+('Draps',                              'draps-hoteliers',             'Draps professionnels hôteliers. Coton blanc 200 fils. Lavage industriel.',8500,NULL,17,'LINGE-DRAPS',100,'in_stock',NULL,true,true),
+('Housses de couette',                 'housses-de-couette',          'Housses de couette hôtelières. Coton percale.',                           7500,NULL,17,'LINGE-HOUS', 100,'in_stock',NULL,true,true),
+('Oreilles et couette',                'oreilles-et-couette',         'Couettes et oreillers garnissage microfibres. Toutes tailles disponibles.',6500,NULL,17,'LINGE-COUE',  80,'in_stock',NULL,true,false),
+('Serviettes',                         'serviettes',                  'Serviettes de bain éponge 500g/m². Broderie disponible.',                 4500,NULL,17,'LINGE-SERV', 150,'in_stock',NULL,true,true),
+('Peignoir',                           'peignoir',                    'Peignoirs éponge hôteliers.',                                             8500,NULL,17,'LINGE-PEIG', 100,'in_stock',NULL,true,false),
+('Tapis',                              'tapis-bain',                  'Tapis de bain hôteliers.',                                                2500,NULL,17,'LINGE-TAPIS',200,'in_stock',NULL,true,false);
 
 -- Produits d'accueil / Amenities (category_id=18)
 INSERT INTO products (name, slug, description, price, original_price, category_id, sku, stock_quantity, stock_status, badge, is_published, is_featured) VALUES
-('Savon & Shampoing hôtelier',         'savon-shampoing-hotelier',    'Savon et shampoings miniatures pour hôtel. Vente par carton de 100 pièces.',      15000,NULL,18,'ACC-SAVON',  50,'in_stock',NULL,true,true),
-('Gel de douche & lotion',             'gel-douche-lotion',           'Gel de douche et lotion corps. Flacon 30ml. Carton de 100 pièces.',                12000,NULL,18,'ACC-GEL',    60,'in_stock',NULL,true,false),
-('Kit dentaire & rasage',              'kit-dentaire-rasage',         'Kit brosse à dents + dentifrice ou rasoir + gel. Vente par carton.',               18000,NULL,18,'ACC-KIT',    40,'in_stock',NULL,true,false),
-('Chaussons et bonnets de douche',     'chaussons-bonnets-douche',    'Chaussons jetables et bonnets de douche. Carton de 100 pièces.',                    8000,NULL,18,'ACC-CHUSS',  80,'in_stock',NULL,true,false),
-('Distributeur & emballages',          'distributeur-emballages',     'Distributeurs de savon liquide et emballages pour amenities. Sur devis.',          25000,NULL,18,'ACC-DISTR',  20,'in_stock','📞 Devis',true,false);
+('Savon & Shampoing',                  'savon-shampoing',             'Savon et shampoings miniatures pour hôtel. Vente par carton de 100 pièces.',      15000,NULL,18,'ACC-SAVON',  50,'in_stock',NULL,true,true),
+('Gel de douche & Lotion',             'gel-douche-lotion',           'Gel de douche et lotion corps. Flacon 30ml. Carton de 100 pièces.',                12000,NULL,18,'ACC-GEL',    60,'in_stock',NULL,true,false),
+('Kit dentaire',                       'kit-dentaire',                'Kit brosse à dents + dentifrice ou rasoir + gel. Vente par carton.',               18000,NULL,18,'ACC-KIT',    40,'in_stock',NULL,true,false),
+('Chausson & Bonnets de douche',       'chausson-bonnets-douche',     'Chaussons jetables et bonnets de douche. Carton de 100 pièces.',                    8000,NULL,18,'ACC-CHUSS',  80,'in_stock',NULL,true,false),
+('Distributeurs et emballages',        'distributeurs-emballages',    'Distributeurs de savon liquide et emballages pour amenities. Sur devis.',          25000,NULL,18,'ACC-DISTR',  20,'in_stock','📞 Devis',true,false);
 
 -- Équipement de chambre (category_id=19)
 INSERT INTO products (name, slug, description, price, original_price, category_id, sku, stock_quantity, stock_status, badge, is_published, is_featured) VALUES
-('Lits & matelas hôteliers',           'lits-matelas-hoteliers',      'Lits et matelas professionnels pour hôtel. Standards simple, double, king-size.',120000,NULL,19,'EQUIP-LIT',  20,'in_stock',NULL,true,true),
+('lits & matelas',                     'lits-matelas',                'Lits et matelas professionnels pour hôtel. Standards simple, double, king-size.',120000,NULL,19,'EQUIP-LIT',  20,'in_stock',NULL,true,true),
 ('Mobilier de chambre',                'mobilier-de-chambre',         'Mobilier complet chambre hôtel : bureau, chevet, commode. Sur devis.',            85000,NULL,19,'EQUIP-MOB',  15,'in_stock','📞 Devis',true,false),
-('Coffres-forts de chambre',           'coffres-forts-chambre',       'Coffre-fort électronique pour chambre hôtel. Code ou carte.',                      45000,NULL,19,'EQUIP-COFFRE',30,'in_stock',NULL,true,false),
-('Minibars hôteliers',                 'minibars-hoteliers',          'Minibar encastrable ou posable. 30 à 60L. Marques professionnelles.',              95000,NULL,19,'EQUIP-MINI', 10,'in_stock',NULL,true,false),
-('TV & accessoires chambre',           'tv-accessoires-chambre',      'Téléviseurs pour hôtel avec support mural et câblage IPTV disponible.',            75000,NULL,19,'EQUIP-TV',   25,'in_stock',NULL,true,true),
-('Rideaux & stores hôteliers',         'rideaux-stores-hoteliers',    'Rideaux occultants et voilages pour chambre hôtel. Pose incluse sur devis.',       35000,NULL,19,'EQUIP-RID',  40,'in_stock',NULL,true,false);
+('Coffres-forts',                      'coffres-forts',               'Coffre-fort électronique pour chambre hôtel. Code ou carte.',                      45000,NULL,19,'EQUIP-COFFRE',30,'in_stock',NULL,true,false),
+('Minibars',                           'minibars',                    'Minibar encastrable ou posable. 30 à 60L. Marques professionnelles.',              95000,NULL,19,'EQUIP-MINI', 10,'in_stock',NULL,true,false),
+('TV & accessoires',                   'tv-accessoires',              'Téléviseurs pour hôtel avec support mural et câblage IPTV disponible.',            75000,NULL,19,'EQUIP-TV',   25,'in_stock',NULL,true,true),
+('Rideaux',                            'rideaux',                     'Rideaux occultants et voilages pour chambre hôtel. Pose incluse sur devis.',       35000,NULL,19,'EQUIP-RID',  40,'in_stock',NULL,true,false);
 
 -- Salle de bain (category_id=20)
 INSERT INTO products (name, slug, description, price, original_price, category_id, sku, stock_quantity, stock_status, badge, is_published, is_featured) VALUES
-('Sèche-cheveux mural',                'seche-cheveux-mural',         'Sèche-cheveux mural professionnel 1800W. Fixation facile. Garanti 2 ans.',         18000,NULL,20,'SDB-SECHE',  50,'in_stock',NULL,true,true),
-('Distributeurs de savon',             'distributeurs-savon-sdb',     'Distributeur de savon liquide mural en inox ou plastique ABS. 300 ou 500ml.',     12000,NULL,20,'SDB-DISTR',  60,'in_stock',NULL,true,false),
-('Accessoires sanitaires',             'accessoires-sanitaires',      'Ensemble accessoires salle de bain hôtel : porte-serviette, brosse WC, miroir.',   25000,NULL,20,'SDB-ACCESS', 35,'in_stock',NULL,true,false),
-('Poubelles & porte-serviette',        'poubelles-porte-serviette',   'Poubelles à pédale et porte-serviette inox. Qualité hôtelière.',                   15000,NULL,20,'SDB-POB',    45,'in_stock',NULL,true,false);
+('Seche-cheveux',                      'seche-cheveux',               'Sèche-cheveux mural professionnel 1800W. Fixation facile. Garanti 2 ans.',         18000,NULL,20,'SDB-SECHE',  50,'in_stock',NULL,true,true),
+('Distributeur de savons',             'distributeur-de-savons',      'Distributeur de savon liquide mural en inox ou plastique ABS. 300 ou 500ml.',     12000,NULL,20,'SDB-DISTR',  60,'in_stock',NULL,true,false),
+('Accessoires sanitaire',              'accessoires-sanitaire',       'Ensemble accessoires salle de bain hôtel : porte-serviette, brosse WC, miroir.',   25000,NULL,20,'SDB-ACCESS', 35,'in_stock',NULL,true,false),
+('Poubelles et portes serviettes',     'poubelles-portes-serviettes', 'Poubelles à pédale et porte-serviette inox. Qualité hôtelière.',                   15000,NULL,20,'SDB-POB',    45,'in_stock',NULL,true,false);
 
 -- Calendrier (Signalétique — category_id=6)
 INSERT INTO products (name, slug, description, price, original_price, category_id, sku, stock_quantity, stock_status, badge, is_published, is_featured) VALUES
