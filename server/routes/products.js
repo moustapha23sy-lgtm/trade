@@ -116,7 +116,7 @@ router.get('/', async (req, res) => {
       LEFT JOIN categories c ON p.category_id = c.id
       LEFT JOIN brands b ON p.brand_id = b.id
       ${whereClause}
-      ORDER BY p.${sortCol} ${sortOrder}
+      ORDER BY p.${sortCol} ${sortOrder}, p.id DESC
       LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
     `;
     params.push(parseInt(limit), offset);
@@ -151,7 +151,7 @@ router.get('/featured', async (req, res) => {
       LEFT JOIN categories c ON p.category_id = c.id
       LEFT JOIN brands b ON p.brand_id = b.id
       WHERE p.is_published = true AND p.is_featured = true
-      ORDER BY p.created_at DESC
+      ORDER BY p.created_at DESC, p.id DESC
       LIMIT 8
     `);
     res.json({ products: rows });
@@ -166,7 +166,7 @@ router.get('/admin', auth, adminOnly, async (req, res) => {
   try {
     const {
       page = 1,
-      limit = 20,
+      limit = 100,
       category,
       brand,
       search,
@@ -231,7 +231,7 @@ router.get('/admin', auth, adminOnly, async (req, res) => {
       LEFT JOIN categories c ON p.category_id = c.id
       LEFT JOIN brands b ON p.brand_id = b.id
       ${whereClause}
-      ORDER BY p.${sortCol} ${sortOrder}
+      ORDER BY p.${sortCol} ${sortOrder}, p.id DESC
       LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
     `;
     params.push(parseInt(limit), offset);
