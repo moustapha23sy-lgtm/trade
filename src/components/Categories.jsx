@@ -3,18 +3,21 @@ import '../styles/Categories.css'
 const categories = [
   {
     title: 'Objets Publicitaires',
+    slug: 'objets-publicitaires',
     desc: 'Cartes, flyers, affiches, calendriers, broderie — votre identité visuelle.',
     icon: 'print',
     image: '/img.png'
   },
   {
     title: 'Électroménager',
+    slug: 'electromenager',
     desc: 'Climatiseurs, réfrigérateurs, téléviseurs, machines à laver et bien plus.',
     icon: 'blender',
     image: '/1.jpeg'
   },
   {
     title: 'Fournitures et Équipement Hôtelier',
+    slug: 'fournitures-equipement-hotelier',
     desc: 'Équipements de chambre, linge hôtelier, salle de bain et produits d\'accueil.',
     icon: 'hotel',
     image: '/2.jpg'
@@ -36,7 +39,7 @@ function Categories({ onCategoryClick }) {
             <div 
               key={index} 
               className="cat-card reveal" 
-              onClick={() => onCategoryClick(`${cat.title} →`)}
+              onClick={() => onCategoryClick(cat.slug)}
             >
               <div 
                 className="cat-card-bg" 

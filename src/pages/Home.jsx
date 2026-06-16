@@ -45,14 +45,7 @@ const Home = ({ showToast }) => {
     }
   }
 
-  const handleCategoryClick = (title) => {
-    const cleanTitle = title.replace(' →', '').trim().toLowerCase();
-    const slug = cleanTitle
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '');
-      
+  const handleCategoryClick = (slug) => {
     navigate(`/category/${slug}`);
   }
 
